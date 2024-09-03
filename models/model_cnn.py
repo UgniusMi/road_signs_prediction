@@ -6,8 +6,8 @@ import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
 from tensorflow.keras.optimizers import Adam # type: ignore
 from tensorflow.keras import layers, models # type: ignore
-from database import get_engine
-from graphs import plot_training_history
+from database.database import get_engine
+from utils.graphs import plot_training_history
 
 
 

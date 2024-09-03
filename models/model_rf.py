@@ -6,8 +6,8 @@ from skimage.feature import hog
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, f1_score, accuracy_score
-from database import get_engine
-from graphs import plot_F1_score_by_class
+from database.database import get_engine
+from utils.graphs import plot_F1_score_by_class
 
 def load_images_with_hog(image_paths, target_size=(64, 64)):
     images = []

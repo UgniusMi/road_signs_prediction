@@ -2,7 +2,7 @@
 datasets/test_images
 datasets/train_images
 savedmodels/
-database/
+database/train_test.db
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

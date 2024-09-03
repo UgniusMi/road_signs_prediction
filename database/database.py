@@ -106,40 +106,50 @@ def get_classes_from_test_and_train_data():
     test_df = pd.read_sql_table('test_data', engine)
     return train_df, test_df
 
-def get_valid_image_path():
-    while True:
-        image_path = input("\033[93mSpecify your image path \033[0m(example: C:\\Users\\Fatalas\\Desktop\\uploads\\yourimage.ppm): ")
-        if os.path.isfile(image_path) and image_path.lower().endswith(('.ppm', '.jpg', '.jpeg', '.png')):
-            return image_path
-        else:
-            print(colored("Invalid image path or format.", "red"))
-
-def get_valid_classid(min_value=0, max_value=42):
-    while True:
-        try:
-            classid = int(input(f"Enter class id (between {min_value} and {max_value}): "))
-            if min_value <= classid <= max_value:
-                return classid
-            else:
-                print(f"Invalid class id.")
-        except ValueError:
-            print(colored("Invalid input. Please enter a valid integer.", "red"))
-
-def browse_file():
-    print("Opening file dialog...")
-    root = tk.Tk()
-    root.withdraw()  # paslepia pagrindini tkinter langa
-    root.attributes('-topmost', True)  # palaiko kad dialogo langas butu virsuje
-    file_path = filedialog.askopenfilename(
-        parent=root,
-        title="Select a file",
-        filetypes=(("Image files", "*.ppm *.jpg *.jpeg *.png"), ("All files", "*.*"))
-    )
-    root.destroy() 
-    if file_path:
-        print(f"Selected file: {file_path}")
-    else:
-        print("No file selected.")
-    return file_path
+classes = {
+    0: 'Speed limit (20km/h)',
+    1: 'Speed limit (30km/h)', 
+    2: 'Speed limit (50km/h)', 
+    3: 'Speed limit (60km/h)', 
+    4: 'Speed limit (70km/h)', 
+    5: 'Speed limit (80km/h)', 
+    6: 'End of speed limit (80km/h)', 
+    7: 'Speed limit (100km/h)', 
+    8: 'Speed limit (120km/h)', 
+    9: 'No passing', 
+    10: 'No passing veh over 3.5 tons', 
+    11: 'Right-of-way at intersection', 
+    12: 'Priority road', 
+    13: 'Yield', 
+    14: 'Stop', 
+    15: 'No vehicles', 
+    16: 'Veh > 3.5 tons prohibited', 
+    17: 'No entry', 
+    18: 'General caution', 
+    19: 'Dangerous curve left', 
+    20: 'Dangerous curve right', 
+    21: 'Double curve', 
+    22: 'Bumpy road', 
+    23: 'Slippery road', 
+    24: 'Road narrows on the right', 
+    25: 'Road work', 
+    26: 'Traffic signals', 
+    27: 'Pedestrians', 
+    28: 'Children crossing', 
+    29: 'Bicycles crossing', 
+    30: 'Beware of ice/snow',
+    31: 'Wild animals crossing', 
+    32: 'End speed + passing limits', 
+    33: 'Turn right ahead', 
+    34: 'Turn left ahead', 
+    35: 'Ahead only', 
+    36: 'Go straight or right', 
+    37: 'Go straight or left', 
+    38: 'Keep right', 
+    39: 'Keep left', 
+    40: 'Roundabout mandatory', 
+    41: 'End of no passing', 
+    42: 'End no passing veh > 3.5 tons'
+}
 
 

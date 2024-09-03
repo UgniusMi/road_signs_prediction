@@ -4,11 +4,11 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from database import TestData, sessionmaker, get_engine
-from model_cnn import load_data
+from database.database import TestData, sessionmaker, get_engine
+from models.model_cnn import load_data
 from skimage.feature import hog
 from sklearn.metrics import classification_report,f1_score, accuracy_score
-from graphs import  plot_F1_score_by_class
+from utils.graphs import  plot_F1_score_by_class
 
 def load_cnn_model(model_path):
     return tf.keras.models.load_model(model_path)
