@@ -1,28 +1,23 @@
 import numpy as np
 import pandas as pd
 import cv2
-import os
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
 from tensorflow.keras.optimizers import Adam # type: ignore
 from tensorflow.keras import layers, models # type: ignore
-import matplotlib.pyplot as plt
-import random
 from database import get_engine
+from graphs import plot_training_history
 
-# Setting seeds for reproducibility
-random.seed(10)
-np.random.seed(10)
-tf.random.set_seed(10)
+
 
 def preprocess_images(image_paths, img_size=(42, 42)):
     images = []
     for path in image_paths:
         img = cv2.imread(path) 
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert to RGB
-        img = cv2.resize(img, img_size)  # Resize image
-        img = img / 255.0  # Normalize
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  
+        img = cv2.resize(img, img_size)  
+        img = img / 255.0  
         images.append(img)
     return np.array(images)
 
@@ -41,7 +36,7 @@ def load_data(train_table_name, test_table_name):
 
     return X_train, X_test, y_train, y_test
 
-def build_model(input_shape, num_classes):
+def create_model(input_shape, num_classes):
     model = tf.keras.Sequential([
         layers.InputLayer(input_shape=input_shape),
         layers.Conv2D(32, (3, 3), activation='relu'),
@@ -56,7 +51,7 @@ def build_model(input_shape, num_classes):
         layers.Dense(num_classes, activation='softmax')
     ])
 
-    optimizer = Adam(learning_rate=0.0007)
+    optimizer = Adam(learning_rate=0.0006)
     model.compile(optimizer=optimizer, 
                   loss='sparse_categorical_crossentropy', 
                   metrics=['accuracy']
@@ -80,49 +75,35 @@ def evaluate_model(model, X_test, y_test):
     print(f"Test accuracy: {test_accuracy:.3f}")
     return test_accuracy
 
-def plot_training_history(history):
-    plt.figure(figsize=(12, 5))
+def save_model(model, filename='savedmodels\\cnnTEST.keras'):
+    model.save(filename)
 
-    plt.subplot(1, 2, 1)
-    plt.plot(history.history['accuracy'], label='Train Accuracy')
-    plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
-    plt.title('Model Accuracy')
-    plt.xlabel('Epoch')
-    plt.ylabel('Accuracy')
-    plt.legend()
-
-    plt.subplot(1, 2, 2)
-    plt.plot(history.history['loss'], label='Train Loss')
-    plt.plot(history.history['val_loss'], label='Validation Loss')
-    plt.title('Model Loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.legend()
-
-    plt.tight_layout()
-    plt.show()
 
 def start_training_model():
-    # Load data
+    
     X_train, X_test, y_train, y_test = load_data('train_data', 'test_data')
-
-    # Split data into training and validation sets
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
 
-    # Determine the number of classes
     num_classes = len(np.unique(y_train))
     print("Number of classes:", num_classes)
 
-    # Build the model
-    model = build_model(input_shape=(42, 42, 3), num_classes=num_classes)
+    model = create_model(input_shape=(42, 42, 3), num_classes=num_classes)
 
-    # Train the model
     history = train_model(model, X_train, y_train, X_val, y_val)
 
-    # Evaluate the model
     evaluate_model(model, X_test, y_test)
 
-    # Plot training history
+    while True:
+        save_option = input("Do you want to save the model? (yes/no): ").strip().lower()
+        if save_option == 'yes':
+            save_model(model)
+            print("Model has been saved.")
+            break
+        elif save_option == 'no':
+            print("Model was not saved.")
+            break
+        else:
+            print("Invalid input. Please enter 'yes' or 'no'.")
+  
     
     plot_training_history(history)
-
