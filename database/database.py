@@ -25,7 +25,8 @@ class TestData(Base):
 databasepath = "sqlite:///database/train_test.db"
 rootpath= "datasets\\train_images"
 output_csv='datasets\\train_data.csv'
-test_images_path = 'datasets/test_images'
+test_images_path = 'datasets\\test_images'
+test_csv_path = 'datasets\\test_data.csv'
 
 def get_engine():
     return create_engine(databasepath)
@@ -52,19 +53,17 @@ def create_one_csv():
                 label = row[7]  
                 data.append([img_path, label])
     
-    with open(output_csv, 'w', newline='') as csvfile:
+    with open(output_csv, 'w', newline='') as csvfile:          
         writer = csv.writer(csvfile)
         writer.writerow(['ImagePath', 'ClassId']) 
         writer.writerows(data)
-    
-    print(f"Data saved to {output_csv}")
 
 def create_test_csv():
     test_df = pd.read_csv('datasets/GT-final_test.csv', delimiter=';')
     test_df = test_df[['Filename', 'ClassId']]
     test_df['ImagePath'] = test_df['Filename'].apply(lambda x: os.path.join(test_images_path, x))
     test_df = test_df[['ImagePath','ClassId']]
-    test_df.to_csv('datasets\\test_data.csv', index=False)
+    test_df.to_csv(test_csv_path, index=False)
     return test_df
 
 def import_csv_data_to_table_with_cleanup(table_name, csv_file_path):
