@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-import cv2
 import pickle
+import cv2
 from skimage.feature import hog
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
@@ -66,7 +66,7 @@ def save_model(model, filename='savedmodels\\rfTEST.pkl'):
         pickle.dump(model, file)
 
 
-def start_training():
+def start_training_rf():
     X_train, X_test, y_train, y_test = load_data('train_data', 'test_data')
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
 
@@ -77,8 +77,18 @@ def start_training():
     print(f"Validation Accuracy: {val_accuracy:.4f}")
     print(f"Test Accuracy: {test_accuracy:.4f}")
     print(f"Test F1 Score: {test_f1:.4f}")
-    
-    save_model(model)
+
+    while True:
+        save_option = input("Do you want to save the model? (yes/no): ").lower()
+        if save_option == 'yes':
+            save_model(model)
+            print("Model has been saved.")
+            break
+        elif save_option == 'no':
+            print("Model was not saved.")
+            break
+        else:
+            print("Invalid input. Please enter 'yes' or 'no'.")
 
     plot_F1_score_by_class(report_df)
 
