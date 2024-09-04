@@ -5,8 +5,6 @@ import pandas as pd
 import csv
 import os
 from termcolor import colored
-import tkinter as tk
-from tkinter import filedialog
 
 Base = declarative_base()
 
