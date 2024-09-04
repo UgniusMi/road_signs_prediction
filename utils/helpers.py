@@ -38,3 +38,11 @@ def browse_file():
     else:
         print("No file selected.")
     return file_path
+
+def open_word_doc(doc_path):
+    try:
+        word_doc = os.startfile(doc_path)
+        return word_doc
+    except Exception as e:
+        print(f"Failed to open the document: {e}")
+        return None
