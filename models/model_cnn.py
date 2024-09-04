@@ -5,13 +5,19 @@ from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
 from tensorflow.keras.optimizers import Adam # type: ignore
-from tensorflow.keras import layers, models # type: ignore
+from tensorflow.keras import layers # type: ignore
 from database.database import get_engine
 from utils.graphs import plot_training_history
 
 
+LR =0.0007
+DROP_RT=0.6 
+CONV_FILTER=[32, 64, 128] 
+DENSE_L = 128
+EPOCHS=15
+BATCH=32
 
-def preprocess_images(image_paths, img_size=(42, 42)):
+def preprocess_images(image_paths, img_size=(48, 48)): #(5,5)kartu su 48x48
     images = []
     for path in image_paths:
         img = cv2.imread(path) 
@@ -36,22 +42,21 @@ def load_data(train_table_name, test_table_name):
 
     return X_train, X_test, y_train, y_test
 
-def create_model(input_shape, num_classes):
+def create_model(input_shape, num_classes, learning_rate=0.0006, dropout_rate=0.6, conv_filters=[32, 64, 128], dense_layer= 128):
     model = tf.keras.Sequential([
-        layers.InputLayer(input_shape=input_shape),
-        layers.Conv2D(32, (3, 3), activation='relu'),
+        layers.InputLayer(input_shape),
+        layers.Conv2D(conv_filters[0], (5, 5), activation='relu'), #(5,5) kartu 48x48
         layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(64, (3, 3), activation='relu'),
+        layers.Conv2D(conv_filters[1], (3, 3), activation='relu'),
         layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(128, (3, 3), activation='relu'),
+        layers.Conv2D(conv_filters[2], (3, 3), activation='relu'),
         layers.MaxPooling2D((2, 2)),
         layers.Flatten(),
-        layers.Dense(128, activation='relu'),
-        layers.Dropout(0.6),
+        layers.Dense(dense_layer, activation='relu'),
+        layers.Dropout(dropout_rate),
         layers.Dense(num_classes, activation='softmax')
     ])
-
-    optimizer = Adam(learning_rate=0.0006)
+    optimizer = Adam(learning_rate=learning_rate)
     model.compile(optimizer=optimizer, 
                   loss='sparse_categorical_crossentropy', 
                   metrics=['accuracy']
@@ -79,7 +84,7 @@ def save_model(model, filename='savedmodels\\cnnTEST.keras'):
     model.save(filename)
 
 
-def start_training_model():
+def start_training_cnn(learning_rate=0.0006, dropout_rate=0.6, conv_filters=[32, 64, 128],dense_layer= 128, epochs=15, batch_size=32):
     
     X_train, X_test, y_train, y_test = load_data('train_data', 'test_data')
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
@@ -87,14 +92,27 @@ def start_training_model():
     num_classes = len(np.unique(y_train))
     print("Number of classes:", num_classes)
 
-    model = create_model(input_shape=(42, 42, 3), num_classes=num_classes)
-
-    history = train_model(model, X_train, y_train, X_val, y_val)
+    model = create_model(input_shape=(48, 48, 3), num_classes=num_classes, 
+                         learning_rate=learning_rate, 
+                         dropout_rate=dropout_rate, 
+                         conv_filters=conv_filters,
+                         dense_layer= dense_layer
+                         )
+    
+    print(f"Drop rate: {dropout_rate}")
+    print(f"conv filter {conv_filters}")
+    print(f"DL {dense_layer}")
+    print(f"Batch size {batch_size}")
+    
+    history = train_model(model, X_train, y_train, X_val, y_val, 
+                          epochs=epochs, 
+                          batch_size=batch_size
+                          )
 
     evaluate_model(model, X_test, y_test)
 
     while True:
-        save_option = input("Do you want to save the model? (yes/no): ").strip().lower()
+        save_option = input("Do you want to save the model? (yes/no): ").lower()
         if save_option == 'yes':
             save_model(model)
             print("Model has been saved.")
