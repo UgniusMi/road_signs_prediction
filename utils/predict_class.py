@@ -25,7 +25,7 @@ def load_rf_model(model_path_rf):
 def load_and_preprocess_image(image_path):
     img = cv2.imread(image_path)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = cv2.resize(img, (42, 42))  
+    img = cv2.resize(img, (48, 48))                #kaip modelis apmokintas 
     img = img / 255.0 
     img = np.expand_dims(img, axis=0)  
     return img
@@ -88,7 +88,6 @@ def predict_all_test(model_path):
     engine = get_engine()
     Session = sessionmaker(bind=engine)
     session = Session()
-    model_path = 'savedmodels\\cnnTEST.keras' # gal maine padaryt viesiem pasiekiam
     model = load_cnn_model(model_path)
 
     test_data = session.query(TestData).all()
