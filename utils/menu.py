@@ -6,8 +6,12 @@ from models.model_rf import start_training_rf
 import random
 from termcolor import colored
 from utils.helpers import *
+import pyfiglet
 
 
+big_text = pyfiglet.figlet_format("Ugnius  Road  Signs")
+big_text += pyfiglet.figlet_format("Recognition  Project!")
+print(big_text)
 
 def main_menu():
     create_db()
@@ -15,14 +19,14 @@ def main_menu():
     create_one_csv()
     print(f"Train data csv file created to this directory {output_csv}")
     create_test_csv()
-    print(f"Test data csv file created to this directory {test_images_path}")
+    print(f"Test data csv file created to this directory {test_csv_path}")
 
     random.seed(10)
     np.random.seed(10)
     tf.random.set_seed(10)
     
     while True:
-        print(colored("\nWelcome to the Ugnius Road Signs Recognition Project!\n", "green"))
+        print(colored("\nWelcome to the Main menu\n", "green"))
         print("1. Manage data ")
         print("2. Train model menu")
         print("3. Prediction menu")
@@ -87,7 +91,7 @@ def main_menu():
                 elif choice == '2':
                     start_training_cnn(learning_rate=LR, dropout_rate=DROP_RT, conv_filters=CONV_FILTER,dense_layer=DENSE_L, epochs=EPOCHS, batch_size=BATCH)
                 elif choice == '3':
-                    start_training_rf() # random forest
+                    start_training_rf() 
                 elif choice == '4':
                     print("You have returned to the main menu")
                     break  
