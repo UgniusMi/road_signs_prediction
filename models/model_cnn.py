@@ -43,8 +43,13 @@ def load_data(train_table_name, test_table_name):
     return X_train, X_test, y_train, y_test
 
 def create_model(input_shape, num_classes, learning_rate=0.0006, dropout_rate=0.6, conv_filters=[32, 64, 128], dense_layer= 128):
+    # data_augmentation = tf.keras.Sequential([
+    # layers.RandomFlip("horizontal"),
+    # layers.RandomContrast(0.3)
+# ])
     model = tf.keras.Sequential([
         layers.InputLayer(input_shape),
+        # data_augmentation,
         layers.Conv2D(conv_filters[0], (5, 5), activation='relu'), #(5,5) kartu 48x48
         layers.MaxPooling2D((2, 2)),
         layers.Conv2D(conv_filters[1], (3, 3), activation='relu'),
