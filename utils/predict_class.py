@@ -9,9 +9,16 @@ from models.model_cnn import load_data
 from skimage.feature import hog
 from sklearn.metrics import classification_report,f1_score, accuracy_score
 from utils.graphs import  plot_F1_score_by_class
+import os
+
 
 def load_cnn_model(model_path):
-    return tf.keras.models.load_model(model_path)
+    try:
+        os.path.exists(model_path)
+        return tf.keras.models.load_model(model_path)
+    except Exception as e:
+        print(f"Could`t find the model: {str(e)}")
+        
 
 def load_rf_model(model_path_rf):
     try:
@@ -19,10 +26,9 @@ def load_rf_model(model_path_rf):
             loaded_model = pickle.load(file)
             return loaded_model
     except Exception as e:
-        print(f"Klaida įkeliant modelį: {str(e)}")
-        exit(1)
+        print(f"Could`t find the model: {str(e)}")
 
-def load_and_preprocess_image(image_path):
+def preprocess_image_for_cnn(image_path):
     img = cv2.imread(image_path)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = cv2.resize(img, (48, 48))                #kaip modelis apmokintas 
@@ -34,14 +40,14 @@ def preprocess_image_for_rf(image_path):
     try:
         img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
         if img is None:
-            raise ValueError(f"Nepavyko įkelti paveiksliuko iš {image_path}")
+            raise ValueError(f"Failed to load image from {image_path}")
         img = cv2.resize(img, (64, 64))
         img = img / 255.0
         hog_features = hog(img, orientations=9, pixels_per_cell=(8, 8), 
                            cells_per_block=(2, 2), block_norm='L2-Hys')
         return hog_features.reshape(1, -1)
     except Exception as e:
-        print(f"Klaida apdorojant paveikslėlį {image_path}: {str(e)}")
+        print(f"Error processing image{image_path}: {str(e)}")
         return None
 
 def predict_class(model, model_type, X_test):
@@ -62,15 +68,13 @@ def display_prediction(image_path, predicted_class, class_descriptions):
     plt.title(f'Predicted Class: {predicted_class} - {class_descriptions.get(predicted_class, "Unknown class")}')
     plt.show()
 
-
 def cnn_prediction(image_path, model_path, class_descriptions):
 
-    processed_image = load_and_preprocess_image(image_path)
-
+    processed_image = preprocess_image_for_cnn(image_path)
     model = load_cnn_model(model_path)
-
     predicted_class = predict_class(model, "cnn", processed_image)
     print(f"Predicted class with CNN model: {predicted_class}")
+    
     display_prediction(image_path, predicted_class, class_descriptions)
 
 
@@ -83,7 +87,6 @@ def rf_prediction(image_path, model_path_rf, class_descriptions):
     
     display_prediction(image_path, predicted_class, class_descriptions)
 
-
 def predict_all_test(model_path):
     engine = get_engine()
     Session = sessionmaker(bind=engine)
@@ -93,10 +96,10 @@ def predict_all_test(model_path):
     test_data = session.query(TestData).all()
 
     for test_record in test_data:
-        processed_image = load_and_preprocess_image(test_record.ImagePath)
+        processed_image = preprocess_image_for_cnn(test_record.ImagePath)
 
         predicted_class = predict_class(model, "cnn", processed_image)
-        print(f"predicted class :{predicted_class}") 
+        # print(f"predicted class :{predicted_class}") 
         test_record.Predicted = predicted_class
         session.add(test_record)
 
