@@ -14,7 +14,7 @@ def get_valid_image_path():
 def get_valid_classid(min_value=0, max_value=42):
     while True:
         try:
-            classid = int(input(f"Enter class id (between {min_value} and {max_value}): "))
+            classid = int(input(f"\nEnter class id (between {min_value} and {max_value}): "))
             if min_value <= classid <= max_value:
                 return classid
             else:

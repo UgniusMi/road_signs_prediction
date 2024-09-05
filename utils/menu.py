@@ -49,6 +49,8 @@ def main_menu():
                 if choice == '1':
                     path = browse_file()
                     if path:
+                        for classid, description in classes.items():
+                            print(f"{classid}: {description}")
                         classid = get_valid_classid()
                         add_trainData(path, classid)
                         print(colored(f"Your image with ({path}) is successfully added to train_data table", "light_green"))
@@ -56,18 +58,20 @@ def main_menu():
                 elif choice == '2':
                     path = browse_file()
                     if path:
+                        for classid, description in classes.items():
+                            print(f"{classid}: {description}")
                         classid = get_valid_classid()
                         add_testData(path, classid)
                         print(colored(f"Your image with path ({path}) is successfully added to test_data table", "light_green"))
 
                 elif choice == '3':
                     table_name = 'train_data'
-                    csv_file_path = 'datasets/train_data.csv'
+                    csv_file_path = output_csv
                     import_csv_data_to_table_with_cleanup(table_name,csv_file_path)
 
                 elif choice == '4':
                     table_name = 'test_data'
-                    csv_file_path = 'datasets/test_data.csv'
+                    csv_file_path = test_csv_path
                     import_csv_data_to_table_with_cleanup(table_name,csv_file_path)
 
                 elif choice == '5':
@@ -103,8 +107,9 @@ def main_menu():
             while True:
                 print(colored("\nWelcome to prediction menu:\n", "light_magenta"))
 
-                model_path = 'savedmodels\\cnn982.keras' # cnn976.keras 42x42
+                model_path = 'savedmodels\\cnn982.keras' 
                 model_path_rf ='savedmodels\\rfTEST.pkl'
+
                 print("1. Predict your image by path with CNN model")
                 print("2. Predict your image by path with Randomforest model")
                 print("3. Predict all test data with CNN model")
